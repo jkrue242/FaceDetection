@@ -1,34 +1,29 @@
-# Written by Joseph Krueger
-
-import cv2
 import numpy as np
+import cv2
 
-haarCascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml')
-
-# camera feed
-cap = cv2.VideoCapture(0)
+face_cascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_default.xml')
+cam = cv2.VideoCapture(0)
 
 while True:
-    ret, frame = cap.read()
-    cv2.imshow('frame', frame)
 
-    # detecting face in grayscale
-    grayImg = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    face = haarCascade.detectMultiScale(grayImg, scaleFactor=1.5, minNeighbors=5)
+    ret, frame = cam.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+    for (x, y, w, h) in faces:
+        # print(x,y,w,h)
+        roi_gray = gray[y:y + h, x:x + w]
+        roi_color = frame[y:y + h, x:x + w]
 
-    for x, y, w, h in face:
+        color = (255, 0, 0)
+        stroke = 2
+        end_cord_x = x + w
+        end_cord_y = y + h
+        cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, stroke)
 
-        # determine roi
-        roiGray = grayImg[y:y+h, x:x+w]
-        roiColor = frame[y:y+h, x:x+w]
-
-        # create rectangle
-        rectColor = (255, 100, 0)
-        thickness = 2
-        cv2.rectangle(frame, (x, y), (x+w, y+h), rectColor, thickness)
-
+    cv2.imshow('Say hi!', frame)
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
 
-cap.release()
+# When everything done, release the capture
+cam.release()
 cv2.destroyAllWindows()
