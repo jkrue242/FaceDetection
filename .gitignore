@@ -133,4 +133,6 @@ dmypy.json
 */.DS_Store
 .idea/
 images/*
-!images/example
+!images/lebron
+recognizers/*
+pickles/*

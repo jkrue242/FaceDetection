@@ -3,10 +3,10 @@
 from train import *
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read("./recognizers/trainer.yml")
+recognizer.read(recognizerFilePath)
 
 # reading from pickle file
-with open("pickles/labels.pickle", 'rb') as f:
+with open(labelsPicklePath, 'rb') as f:
     og_labels = pickle.load(f)
     labels = {v: k for k, v in og_labels.items()}
 
@@ -19,7 +19,7 @@ while True:
 
     # running cascade on grayscale image
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+    faces = faceCascade.detectMultiScale(gray, scaleFactor=2, minNeighbors=5)
     for (x, y, w, h) in faces:
 
         # setting roi
@@ -28,12 +28,13 @@ while True:
 
         # recognizing
         id_, conf = recognizer.predict(roi_gray)
-        if 50 <= conf:
+
+        if 10 <= conf <= 90:
             font = cv2.FONT_HERSHEY_SIMPLEX
             name = labels[id_]
             color = (255, 0, 255)
             stroke = 2
-            cv2.putText(frame, name, (x, y), font, 1, color, stroke, cv2.LINE_AA)
+            cv2.putText(frame, name, (x, y-10), font, 1, color, stroke, cv2.LINE_AA)
 
         # drawing rectangle around face
         color = (255, 255, 0)
