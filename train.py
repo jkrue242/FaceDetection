@@ -7,11 +7,11 @@ import pickle
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "images")
 
-faceCascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml')
+faceCascade = cv2.CascadeClassifier('cascades/data/haarcascade_frontalface_alt2.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-current_id = 0
-label_ids = {}
+cId = 0
+labelIds = {}
 yLabels = []
 xTrain = []
 
@@ -21,26 +21,26 @@ for root, dirs, files in os.walk(IMAGE_DIR):
             path = os.path.join(root, file)
             label = os.path.basename(root).replace(" ", "-").lower()
             # print(label, path)
-            if label not in label_ids:
-                label_ids[label] = current_id
-                current_id += 1
-            id_ = label_ids[label]
+            if not label in labelIds:
+                labelIds[label] = cId
+                cId += 1
+            id_ = labelIds[label]
 
-            # creating np.array out of image pixel data
-            pilImage = Image.open(path).convert("L")  # grayscale
+            # convert image to numpy array
+            pil_image = Image.open(path).convert("L")
             size = (550, 550)
-            finalImage = pilImage.resize(size, Image.Resampling.LANCZOS)
-            imageArray = np.array(finalImage, "uint8")
-            faces = faceCascade.detectMultiScale(imageArray, scaleFactor=1.5, minNeighbors=5)
+            final_image = pil_image.resize(size, Image.Resampling.LANCZOS)
+            image_array = np.array(final_image, "uint8")
+
+            faces = faceCascade.detectMultiScale(image_array, scaleFactor=1.5, minNeighbors=5)
 
             for (x, y, w, h) in faces:
-                roi = imageArray[y:y + h, x:x + w]
+                roi = image_array[y:y + h, x:x + w]
                 xTrain.append(roi)
                 yLabels.append(id_)
 
-
 with open("pickles/labels.pickle", 'wb') as f:
-    pickle.dump(label_ids, f)
+    pickle.dump(labelIds, f)
 
 recognizer.train(xTrain, np.array(yLabels))
 recognizer.save("recognizers/trainer.yml")
