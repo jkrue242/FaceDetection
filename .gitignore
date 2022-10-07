@@ -134,5 +134,5 @@ dmypy.json
 .idea/
 images/*
 !images/lebron
-recognizers/*
-pickles/*
+recognizers
+pickles
