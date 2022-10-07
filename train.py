@@ -5,42 +5,42 @@ from PIL import Image
 import pickle
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_DIR = os.path.join(BASE_DIR, "images")
+image_dir = os.path.join(BASE_DIR, "images")
 
-faceCascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml')
+faceCascade = cv2.CascadeClassifier('cascades/data/haarcascade_frontalface_default.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 current_id = 0
 label_ids = {}
-yLabels = []
-xTrain = []
+y_labels = []
+x_train = []
 
-for root, dirs, files in os.walk(IMAGE_DIR):
+for root, dirs, files in os.walk(image_dir):
     for file in files:
         if file.endswith("png") or file.endswith("jpg"):
             path = os.path.join(root, file)
             label = os.path.basename(root).replace(" ", "-").lower()
-            # print(label, path)
-            if label not in label_ids:
+
+            if not label in label_ids:
                 label_ids[label] = current_id
                 current_id += 1
             id_ = label_ids[label]
 
-            # creating np.array out of image pixel data
-            pilImage = Image.open(path).convert("L")  # grayscale
+            pil_image = Image.open(path).convert("L")  # grayscale
             size = (550, 550)
-            finalImage = pilImage.resize(size, Image.Resampling.LANCZOS)
-            imageArray = np.array(finalImage, "uint8")
-            faces = faceCascade.detectMultiScale(imageArray, scaleFactor=1.5, minNeighbors=5)
+            final_image = pil_image.resize(size, Image.ANTIALIAS)
+            image_array = np.array(final_image, "uint8")
+            faces = faceCascade.detectMultiScale(image_array, scaleFactor=1.5, minNeighbors=5)
 
             for (x, y, w, h) in faces:
-                roi = imageArray[y:y + h, x:x + w]
-                xTrain.append(roi)
-                yLabels.append(id_)
+                roi = image_array[y:y + h, x:x + w]
+                x_train.append(roi)
+                y_labels.append(id_)
 
-
-with open("pickles/labels.pickle", 'wb') as f:
+labelsPicklePath = "pickles/labels.pickle"
+with open(labelsPicklePath, 'wb') as f:
     pickle.dump(label_ids, f)
 
-recognizer.train(xTrain, np.array(yLabels))
-recognizer.save("recognizers/trainer.yml")
+recognizerFilePath = "recognizers/recognizer.yml"
+recognizer.train(x_train, np.array(y_labels))
+recognizer.save(recognizerFilePath)

@@ -56,7 +56,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+*.log98
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -128,8 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-
+# other
 .DS_Store
+*/.DS_Store
 .idea/
 images/*
-!images/example
+!images/lebron
+recognizers/*
+pickles/*
