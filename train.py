@@ -1,3 +1,5 @@
+# Written by Joseph Krueger
+
 import cv2
 import os
 import numpy as np
